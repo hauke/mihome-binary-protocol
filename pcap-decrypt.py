@@ -69,7 +69,7 @@ cap = pyshark.FileCapture(
 device_token = {}  # type: Dict[str, bytes]
 
 for packet in cap:
-    if "data" not in packet:
+    if "DATA" not in dir(packet):
         continue
     if (not ipaddress.ip_address(packet.ip.src).is_private
             or not ipaddress.ip_address(packet.ip.dst).is_private):
@@ -79,15 +79,15 @@ for packet in cap:
     mac_src, mac_dst = get_macs(packet)
     incoming = mac_src.upper()[0:8] in MAC_PREFIXES_XIAOMI
     outgoing = mac_dst.upper()[0:8] in MAC_PREFIXES_XIAOMI
-    packet.data.raw_mode = True
-    data = bytearray.fromhex(packet.data.data)
+    packet.DATA.raw_mode = True
+    data = bytearray.fromhex(packet.DATA.data)
     mp = miio.MiioPacket()
     mp.read(data)
 
     print("\n### {0} => {1} ({2} => {3})".format(
         packet.ip.src, packet.ip.dst, mac_src, mac_dst))
     if args.print_raw:
-        print("RAW: %s" % packet.data.data)
+        print("RAW: %s" % packet.DATA.data)
     if args.print_headers:
         print("HEADER:")
         miio.print_head(data)
